@@ -71,19 +71,19 @@ jobs:
       with:
         repository: bcocbo/backstage-k8s-manifests-poc
         token: ${{ secrets.MANIFESTS_REPO_TOKEN }}  
-        path: manifests-repo
+        path: manifests
 
 
     - name: Update image tag
       run: |
-        cd manifests-repo
+        cd manifests
         NEW_TAG=$(echo "${{ needs.build-and-push.outputs.image-tag }}" | grep "main-" | head -1)
         sed -i "s|image: .*backstage.*|image: $NEW_TAG|g" manifests/base/backstage-deployment.yaml
        
 
     - name: Commit and push changes
       run: |
-        cd manifests-repo
+        cd manifests
         git config user.name "GitHub Actions"
         git config user.email "actions@github.com"
         git add .

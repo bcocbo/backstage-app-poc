@@ -29,21 +29,14 @@ import {
   AlertDisplay,
   OAuthRequestDialog,
   SignInPage,
-  SignInProviderConfig,
 } from '@backstage/core-components';
-import { githubAuthApiRef } from '@backstage/core-plugin-api';
 import { createApp } from '@backstage/app-defaults';
 import { AppRouter, FlatRoutes } from '@backstage/core-app-api';
 import { CatalogGraphPage } from '@backstage/plugin-catalog-graph';
 import { RequirePermission } from '@backstage/plugin-permission-react';
 import { catalogEntityCreatePermission } from '@backstage/plugin-catalog-common/alpha';
-
-const githubProvider: SignInProviderConfig = {
-  id: 'github-auth-provider',
-  title: 'GitHub',
-  message: 'Sign in using GitHub',
-  apiRef: githubAuthApiRef,
-};
+import { NotificationsPage } from '@backstage/plugin-notifications';
+import { SignalsDisplay } from '@backstage/plugin-signals';
 
 const app = createApp({
   apis,
@@ -65,16 +58,9 @@ const app = createApp({
     });
   },
   components: {
-    SignInPage: props => (
-      <SignInPage
-        {...props}
-        auto
-        provider={githubProvider}
-      />
-    ),
+    SignInPage: props => <SignInPage {...props} auto providers={['guest']} />,
   },
 });
-
 
 const routes = (
   <FlatRoutes>
@@ -110,6 +96,7 @@ const routes = (
     </Route>
     <Route path="/settings" element={<UserSettingsPage />} />
     <Route path="/catalog-graph" element={<CatalogGraphPage />} />
+    <Route path="/notifications" element={<NotificationsPage />} />
   </FlatRoutes>
 );
 
@@ -117,6 +104,7 @@ export default app.createRoot(
   <>
     <AlertDisplay />
     <OAuthRequestDialog />
+    <SignalsDisplay />
     <AppRouter>
       <Root>{routes}</Root>
     </AppRouter>

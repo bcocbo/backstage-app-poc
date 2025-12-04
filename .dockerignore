@@ -1,0 +1,5 @@
+dist-types
+packages/*/dist
+plugins/*/dist
+*.local.yaml
+

@@ -20,8 +20,6 @@ RUN echo "backstage-app" | npx @backstage/create-app@latest --skip-install
 
 # Cambiar al directorio de la aplicación
 WORKDIR /app/backstage-app
-
-
 # Instalar dependencias
 # RUN yarn add @testing-library/react@^16.0.0 react@^18.0.0 react-dom@^18.0.0
 RUN yarn --cwd ./packages/backend add pg

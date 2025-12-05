@@ -14,15 +14,10 @@ backend:
   # auth:
   #   keys:
   #     - secret: ${BACKEND_SECRET}
-  auth:
-    providers:
-      guest: {}
-    dangerouslyDisableDefaultAuthPolicy: true  
   baseUrl: http://localhost:7007
   listen:
     port: 7007
-    # Uncomment the following host directive to bind to specific interfaces
-    # host: 127.0.0.1
+    host: 0.0.0.0
   csp:
     connect-src: ["'self'", 'http:', 'https:']
     # Content-Security-Policy directives follow the Helmet format: https://helmetjs.github.io/#reference
@@ -83,10 +78,7 @@ auth:
 
 scaffolder:
   # see https://backstage.io/docs/features/software-templates/configuration for software template options
-  rules:
-    - allow: [Template]
-      resourceType: template
-      action: read
+
 catalog:
   import:
     entityFilename: catalog-info.yaml
@@ -125,15 +117,5 @@ kubernetes:
 
 # see https://backstage.io/docs/permissions/getting-started for more on the permission framework
 permission:
+  # setting this to `false` will disable permissions
   enabled: true
-  rules:
-    - allow: [CatalogEntity]  # Permite leer entidades del catálogo
-      resourceType: catalog-entity
-      action: read
-    - allow: [Component, API, User, Group]  # Para tu catalog-info.yaml
-      resourceType: catalog-entity
-      action: read
-      conditions:
-        anyOf:
-          - resourceRef: user:default/guest  # Específico para tu guest
-          - isEntityPublic: true

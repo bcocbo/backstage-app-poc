@@ -17,6 +17,7 @@ backend:
   auth:
     providers:
       guest: {}
+    dangerouslyDisableDefaultAuthPolicy: true  
   baseUrl: http://localhost:7007
   listen:
     port: 7007
@@ -82,7 +83,10 @@ auth:
 
 scaffolder:
   # see https://backstage.io/docs/features/software-templates/configuration for software template options
-
+  rules:
+    - allow: [Template]
+      resourceType: template
+      action: read
 catalog:
   import:
     entityFilename: catalog-info.yaml
@@ -123,11 +127,13 @@ kubernetes:
 permission:
   enabled: true
   rules:
-    - allow: [CatalogEntity]
+    - allow: [CatalogEntity]  # Permite leer entidades del catálogo
       resourceType: catalog-entity
       action: read
-      policy: allow
+    - allow: [Component, API, User, Group]  # Para tu catalog-info.yaml
+      resourceType: catalog-entity
+      action: read
       conditions:
         anyOf:
-          - allOf: [{ isEntityOwner: { claims: ['user:default/guest'] } }]
-          - allOf: [{ isEntityPublic: true }]
+          - resourceRef: user:default/guest  # Específico para tu guest
+          - isEntityPublic: true

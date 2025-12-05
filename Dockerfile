@@ -55,7 +55,6 @@ RUN mkdir -p /app && \
 WORKDIR /app
 USER backstage
 
-
 # Copiar TODA la aplicación construida (approach más seguro)
 COPY --from=builder --chown=backstage:backstage /app/backstage-app ./
 

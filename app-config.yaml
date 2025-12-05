@@ -14,6 +14,9 @@ backend:
   # auth:
   #   keys:
   #     - secret: ${BACKEND_SECRET}
+  auth:
+    providers:
+      guest: {}
   baseUrl: http://localhost:7007
   listen:
     port: 7007
@@ -118,5 +121,13 @@ kubernetes:
 
 # see https://backstage.io/docs/permissions/getting-started for more on the permission framework
 permission:
-  # setting this to `false` will disable permissions
   enabled: true
+  rules:
+    - allow: [CatalogEntity]
+      resourceType: catalog-entity
+      action: read
+      policy: allow
+      conditions:
+        anyOf:
+          - allOf: [{ isEntityOwner: { claims: ['user:default/guest'] } }]
+          - allOf: [{ isEntityPublic: true }]

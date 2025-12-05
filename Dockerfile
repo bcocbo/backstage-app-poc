@@ -35,11 +35,8 @@ COPY catalog-info.yaml ./catalog-info.yaml
 COPY /packages/app/src/App.tsx ./packages/app/src/App.tsx
 COPY /packages/backend/src/index.ts ./packages/backend/src/index.ts
 COPY /examples ./examples
-
 # Construir la aplicación
-
 RUN yarn build:backend
-
 
 # Production stage
 FROM node:20-bullseye-slim
@@ -68,8 +65,6 @@ RUN echo "=== RUNTIME FILES ===" && \
     ls -la packages/backend/ && \
     ls -la packages/app/ 2>/dev/null || echo "No dist directory found" && \
     echo "=== END RUNTIME FILES ==="
-
-
 
 ENTRYPOINT ["dumb-init", "--"]
 CMD ["sh", "-c", "yarn start   2>/dev/null"]

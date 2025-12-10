@@ -166,28 +166,27 @@ spec:
           chartRepo: https://github.com/bcocbo/eks_baseline_chart_Helm
           appRepo: ${{ steps['publish-app'].output.remoteUrl }}
 
-    # Paso 4: Publicar configuración en GitOps (commit directo para setup inicial)
+    # Paso 4: Publicar configuración en GitOps
     - id: publish-gitops
       name: Publicar en Repositorio GitOps
-      action: publish:github
+      action: publish:github:pull-request
       input:
         repoUrl: github.com?repo=gitops-apps&owner=bcocbo
-        description: 'Setup inicial de ${{ parameters.name }} en ${{ parameters.environment }}'
-        sourcePath: .
-        targetPath: .
-        gitCommitMessage: |
-          feat: Add ${{ parameters.name }} to ${{ parameters.environment }}
+        branchName: add-${{ parameters.name }}-${{ parameters.environment }}
+        title: 'feat: Add ${{ parameters.name }} to ${{ parameters.environment }}'
+        description: |
+          ## Nueva Aplicación: ${{ parameters.name }}
           
-          - Entorno: ${{ parameters.environment }}
-          - Namespace: ${{ parameters.environment }}
-          - Réplicas: ${{ parameters.replicas }}
-          - Repositorio: ${{ steps['publish-app'].output.remoteUrl }}
+          - **Entorno:** ${{ parameters.environment }}
+          - **Namespace:** ${{ parameters.environment }}
+          - **Réplicas:** ${{ parameters.replicas }}
+          - **Repositorio:** ${{ steps['publish-app'].output.remoteUrl }}
           
-          Archivos creados:
-          - values/${{ parameters.environment }}/${{ parameters.name }}/values.yaml
-          - argocd/applications/${{ parameters.environment }}/${{ parameters.name }}.yaml
+          ### Archivos creados:
+          - `values/${{ parameters.environment }}/${{ parameters.name }}/values.yaml`
+          - `argocd/applications/${{ parameters.environment }}/${{ parameters.name }}.yaml`
           
-          Creado automáticamente por Backstage
+          🤖 Creado automáticamente por Backstage
 
     # Paso 6: Registrar en el catálogo
     - id: register

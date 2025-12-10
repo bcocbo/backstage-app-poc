@@ -80,19 +80,19 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # Copiar dependencias desde builder
-COPY --from=builder /root/.local /root/.local
+COPY --from=builder /root/.local /home/appuser/.local
 
 # Copiar código fuente
 COPY . .
 
 # Usuario no-root
 RUN useradd -m -u 1001 appuser && \
-    chown -R appuser:appuser /app
+    chown -R appuser:appuser /app /home/appuser/.local
 
 USER appuser
 
 # Agregar .local/bin al PATH
-ENV PATH=/root/.local/bin:$PATH
+ENV PATH=/home/appuser/.local/bin:$PATH
 
 # Exponer puerto
 EXPOSE 8000

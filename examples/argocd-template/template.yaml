@@ -1,0 +1,216 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: argocd-hola-mundo-template
+  title: ArgoCD - Aplicación Hola Mundo
+  description: Plantilla para desplegar una aplicación Hola Mundo usando ArgoCD y GitOps
+  tags:
+    - argocd
+    - gitops
+    - kubernetes
+    - hola-mundo
+spec:
+  owner: user:guest
+  type: service
+
+  parameters:
+    - title: Información de la Aplicación
+      required:
+        - name
+        - environment
+      properties:
+        name:
+          title: Nombre de la Aplicación
+          type: string
+          description: Nombre único de la aplicación (ej. hola-mundo)
+          ui:autofocus: true
+          pattern: '^[a-z0-9-]+$'
+        environment:
+          title: Entorno
+          type: string
+          description: Entorno de despliegue
+          default: dev
+          enum:
+            - dev
+            - staging
+            - prod
+          enumNames:
+            - 'Development'
+            - 'Staging'
+            - 'Production'
+        description:
+          title: Descripción
+          type: string
+          description: Descripción breve de la aplicación
+          default: Aplicación desplegada con ArgoCD y GitOps
+
+    - title: Tipo de Aplicación
+      required:
+        - applicationType
+      properties:
+        applicationType:
+          title: Tipo de Aplicación
+          type: string
+          description: Selecciona el tipo de aplicación
+          default: custom
+          enum:
+            - custom
+            - prebuilt
+          enumNames:
+            - 'Aplicación Python (con código fuente)'
+            - 'Imagen Preconstruida (nginx, redis, etc.)'
+      dependencies:
+        applicationType:
+          oneOf:
+            - properties:
+                applicationType:
+                  enum:
+                    - custom
+            - properties:
+                applicationType:
+                  enum:
+                    - prebuilt
+                image:
+                  title: Imagen Docker
+                  type: string
+                  description: Imagen Docker preconstruida (ej. nginx, redis)
+                  default: nginxdemos/hello
+                imageTag:
+                  title: Tag de la Imagen
+                  type: string
+                  description: Versión/tag de la imagen
+                  default: latest
+
+    - title: Configuración de Despliegue
+      required:
+        - replicas
+      properties:
+        replicas:
+          title: Número de Réplicas
+          type: number
+          description: Cantidad de pods a desplegar
+          default: 2
+          minimum: 1
+          maximum: 10
+
+    - title: Repositorio de la Aplicación
+      required:
+        - repoUrl
+      properties:
+        repoUrl:
+          title: Repositorio para el Código
+          type: string
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - github.com
+            allowedOwners:
+              - bcocbo
+
+  steps:
+    # Paso 1: Crear archivos base (comunes a todos)
+    - id: fetch-base
+      name: Obtener Template Base
+      action: fetch:template
+      input:
+        url: ./content
+        values:
+          name: ${{ parameters.name }}
+          environment: ${{ parameters.environment }}
+          namespace: ${{ parameters.environment }}
+          description: ${{ parameters.description }}
+          applicationType: ${{ parameters.applicationType }}
+          language: python
+          image: ${{ parameters.image if parameters.applicationType == 'prebuilt' else '' }}
+          imageTag: ${{ parameters.imageTag if parameters.applicationType == 'prebuilt' else 'latest' }}
+          replicas: ${{ parameters.replicas }}
+          repoUrl: ${{ parameters.repoUrl }}
+          isCustomApp: ${{ parameters.applicationType == 'custom' }}
+          isPrebuiltImage: ${{ parameters.applicationType == 'prebuilt' }}
+    
+    # Paso 1b: Agregar archivos de Python (solo si es custom)
+    - id: fetch-python
+      name: Obtener Archivos de Python
+      action: fetch:template
+      if: ${{ parameters.applicationType == 'custom' }}
+      input:
+        url: ./content-python
+        values:
+          name: ${{ parameters.name }}
+          description: ${{ parameters.description }}
+          environment: ${{ parameters.environment }}
+
+    # Paso 2: Publicar el repositorio de la aplicación
+    - id: publish-app
+      name: Publicar Repositorio de Aplicación
+      action: publish:github
+      input:
+        description: ${{ parameters.description }}
+        repoUrl: ${{ parameters.repoUrl }}
+        defaultBranch: main
+        repoVisibility: public
+
+    # Paso 3: Crear values para GitOps
+    - id: create-values
+      name: Crear Values para ArgoCD
+      action: fetch:template
+      input:
+        url: ./gitops-values
+        values:
+          name: ${{ parameters.name }}
+          environment: ${{ parameters.environment }}
+          namespace: ${{ parameters.environment }}
+          image: ${{ parameters.image }}
+          imageTag: ${{ parameters.imageTag }}
+          replicas: ${{ parameters.replicas }}
+          chartRepo: https://github.com/bcocbo/eks_baseline_chart_Helm
+          appRepo: ${{ steps['publish-app'].output.remoteUrl }}
+
+    # Paso 4: Publicar configuración en GitOps (commit directo para setup inicial)
+    - id: publish-gitops
+      name: Publicar en Repositorio GitOps
+      action: publish:github
+      input:
+        repoUrl: github.com?repo=gitops-apps&owner=bcocbo
+        description: 'Setup inicial de ${{ parameters.name }} en ${{ parameters.environment }}'
+        sourcePath: .
+        targetPath: .
+        gitCommitMessage: |
+          feat: Add ${{ parameters.name }} to ${{ parameters.environment }}
+          
+          - Entorno: ${{ parameters.environment }}
+          - Namespace: ${{ parameters.environment }}
+          - Réplicas: ${{ parameters.replicas }}
+          - Repositorio: ${{ steps['publish-app'].output.remoteUrl }}
+          
+          Archivos creados:
+          - values/${{ parameters.environment }}/${{ parameters.name }}/values.yaml
+          - argocd/applications/${{ parameters.environment }}/${{ parameters.name }}.yaml
+          
+          Creado automáticamente por Backstage
+
+    # Paso 6: Registrar en el catálogo
+    - id: register
+      name: Registrar en el Catálogo
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps['publish-app'].output.repoContentsUrl }}
+        catalogInfoPath: '/catalog-info.yaml'
+
+  output:
+    links:
+      - title: Repositorio de la Aplicación
+        url: ${{ steps['publish-app'].output.remoteUrl }}
+      - title: Repositorio GitOps
+        url: https://github.com/bcocbo/gitops-apps
+      - title: Ver en el Catálogo
+        icon: catalog
+        entityRef: ${{ steps['register'].output.entityRef }}
+    text:
+      - title: Próximos Pasos
+        content: |
+          ✅ Aplicación configurada automáticamente en GitOps
+          
+          1. ArgoCD detectará los cambios automáticamente
+          2. Verifica el despliegue en tu cluster de Kubernetes
+          3. Para aplicaciones custom, el primer build se ejecutará al hacer push a main/develop

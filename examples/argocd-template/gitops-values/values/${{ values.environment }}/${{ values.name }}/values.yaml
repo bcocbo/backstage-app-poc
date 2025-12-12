@@ -1,0 +1,128 @@
+# Values para ${{ values.name }} en ${{ values.environment }}
+# Generado automáticamente por Backstage
+# Tipo: ${{ values.applicationType }}{% if values.isCustomApp %} (${{ values.language }}){% endif %}
+
+# =============================================================================
+# MICROSERVICE CONFIGURATION
+# =============================================================================
+microservice:
+  name: "${{ values.name }}"
+  namespace: "${{ values.environment }}"
+{% if values.isPrebuiltImage %}
+  image: "${{ values.image }}:${{ values.imageTag }}"
+{% else %}
+  image: "226633502530.dkr.ecr.us-east-1.amazonaws.com/${{ values.name }}:latest"
+{% endif %}
+  port: {% if values.isPrebuiltImage %}80{% else %}8000{% endif %}
+  replicas: ${{ values.replicas }}
+  
+  # Service Account
+  serviceAccountName: "default"
+  automountServiceAccountToken: false
+  
+  # Flags de características
+  flags:
+    openTelemetry: false
+  
+  # Seguridad (configurado para Python apps non-root)
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1001
+    runAsGroup: 1001
+    fsGroup: 1001
+    seccompProfile: "RuntimeDefault"
+    capabilities:
+      drop:
+        - ALL
+  
+  # Recursos
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  
+  # Health checks configurados para Python Flask
+  probes:
+    liveness:
+      enabled: true
+      httpGet:
+        path: {% if values.isPrebuiltImage %}/{% else %}/health{% endif %}
+        port: {% if values.isPrebuiltImage %}80{% else %}8000{% endif %}
+        scheme: HTTP
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 3
+    
+    readiness:
+      enabled: true
+      httpGet:
+        path: {% if values.isPrebuiltImage %}/{% else %}/health{% endif %}
+        port: {% if values.isPrebuiltImage %}80{% else %}8000{% endif %}
+        scheme: HTTP
+      initialDelaySeconds: 10
+      periodSeconds: 5
+      timeoutSeconds: 3
+      failureThreshold: 3
+    
+    startup:
+      enabled: false
+  
+  # Etiquetas estándar
+  labels:
+    app: "${{ values.name }}"
+    environment: "${{ values.environment }}"
+    team: "platform"
+    costCenter: "engineering"
+    applicationCode: "${{ values.name }}"
+    projectName: "backstage-apps"
+    pmo: "platform-team"
+    responsible: "devops"
+  
+  # Estrategia de despliegue
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+
+# =============================================================================
+# SERVICE CONFIGURATION
+# =============================================================================
+service:
+  type: ClusterIP
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: {% if values.isPrebuiltImage %}80{% else %}8000{% endif %}
+      portName: http
+
+# =============================================================================
+# CONFIGMAP CONFIGURATION
+# =============================================================================
+configmap:
+  enabled: true
+  data:
+    ENVIRONMENT: "${{ values.environment }}"
+    APP_NAME: "${{ values.name }}"
+
+# =============================================================================
+# HPA CONFIGURATION
+# =============================================================================
+hpa:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+
+# =============================================================================
+# ISTIO CONFIGURATION (disabled by default)
+# =============================================================================
+gateway:
+  enabled: false
+
+virtualService:
+  enabled: false

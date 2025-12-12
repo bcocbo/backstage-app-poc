@@ -1,0 +1,16 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: backstage
+  description: Backstage Developer Portal with ArgoCD and GitOps integration
+  annotations:
+    github.com/project-slug: bcocbo/backstage-app-poc
+    backstage.io/techdocs-ref: dir:.
+    argocd/app-name: testapp-001f
+    argocd/app-namespace: argocd
+spec:
+  type: website
+  owner: user:guest
+  lifecycle: production
+
+

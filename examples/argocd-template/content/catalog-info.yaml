@@ -1,0 +1,26 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ${{ values.name }}
+  description: ${{ values.description }}
+  annotations:
+    github.com/project-slug: ${{ values.repoUrl | parseRepoUrl | pick('owner') }}/${{ values.repoUrl | parseRepoUrl | pick('repo') }}
+    backstage.io/kubernetes-id: ${{ values.name }}
+    argocd/app-name: ${{ values.name }}
+    argocd/app-namespace: argocd
+  tags:
+    - argocd
+    - kubernetes
+    - gitops
+    - ${{ values.environment }}
+  links:
+    - url: https://localhost:8080/applications/${{ values.name }}
+      title: ArgoCD Application
+      icon: dashboard
+    - url: https://github.com/bcocbo/gitops-apps/tree/main/values/${{ values.environment }}/${{ values.name }}
+      title: GitOps Config
+      icon: code
+spec:
+  type: service
+  lifecycle: ${{ values.environment }}
+  owner: user:guest

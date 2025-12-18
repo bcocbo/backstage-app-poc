@@ -15,9 +15,9 @@ backend:
   #   keys:
   #     - secret: ${BACKEND_SECRET}
   auth:
+    dangerouslyAllowUnauthenticatedAccess: true
     providers:
       guest: {}
-        dangerouslyAllowUnauthenticatedAccess: true
   baseUrl: http://localhost:7007
   listen:
     port: 7007

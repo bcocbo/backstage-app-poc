@@ -14,10 +14,15 @@ backend:
   # auth:
   #   keys:
   #     - secret: ${BACKEND_SECRET}
+  auth:
+    providers:
+      guest: {}
+    dangerouslyDisableDefaultAuthPolicy: true  
   baseUrl: http://localhost:7007
   listen:
     port: 7007
-    host: 0.0.0.0
+    # Uncomment the following host directive to bind to specific interfaces
+    # host: 127.0.0.1
   csp:
     connect-src: ["'self'", 'http:', 'https:']
     # Content-Security-Policy directives follow the Helmet format: https://helmetjs.github.io/#reference
@@ -29,6 +34,8 @@ backend:
   # This is for local development only, it is not recommended to use this in production
   # The production database configuration is stored in app-config.production.yaml
   database:
+    #client: better-sqlite3
+    #connection: ':memory:'
     client: pg
     connection:
       host: ${POSTGRES_HOST}
@@ -41,6 +48,8 @@ backend:
 integrations:
   github:
     - host: github.com
+      # This is a Personal Access Token or PAT from GitHub. You can find out how to generate this token, and more information
+      # about setting up the GitHub integration here: https://backstage.io/docs/integrations/github/locations#configuration
       token: ${GITHUB_TOKEN}
     ### Example for how to add your GitHub Enterprise instance using the API:
     # - host: ghe.example.net
@@ -74,14 +83,10 @@ auth:
 
 scaffolder:
   # see https://backstage.io/docs/features/software-templates/configuration for software template options
-  defaultAuthor:
-    name: Backstage
-    email: backstage@example.com
-  defaultCommitMessage: 'Initial commit from Backstage'
-  github:
-    token: ${GITHUB_TOKEN}
-    visibility: public
-
+  rules:
+    - allow: [Template]
+      resourceType: template
+      action: read
 catalog:
   import:
     entityFilename: catalog-info.yaml
@@ -96,12 +101,6 @@ catalog:
     # Local example template
     - type: file
       target: ../../examples/template/template.yaml
-      rules:
-        - allow: [Template]
-
-    # ArgoCD Hola Mundo template
-    - type: file
-      target: ../../examples/argocd-template/template.yaml
       rules:
         - allow: [Template]
 
@@ -124,23 +123,17 @@ catalog:
 kubernetes:
   # see https://backstage.io/docs/features/kubernetes/configuration for kubernetes configuration options
 
-argocd:
-  # ArgoCD instance configuration for frontend plugin
-  # The frontend plugin connects directly to ArgoCD API
-  username: ${ARGOCD_USERNAME}
-  password: ${ARGOCD_PASSWORD}
-  # OR use token (recommended)
-  # token: ${ARGOCD_AUTH_TOKEN}
-  waitCycles: 25
-  appLocatorMethods:
-    - type: 'config'
-      instances:
-        - name: argoInstance1
-          url: ${ARGOCD_URL}
-          # Skip TLS verification for self-signed certs
-          skipTLSVerify: true
-
 # see https://backstage.io/docs/permissions/getting-started for more on the permission framework
 permission:
-  # setting this to `false` will disable permissions
   enabled: true
+  rules:
+    - allow: [CatalogEntity]  # Permite leer entidades del catálogo
+      resourceType: catalog-entity
+      action: read
+    - allow: [Component, API, User, Group]  # Para tu catalog-info.yaml
+      resourceType: catalog-entity
+      action: read
+      conditions:
+        anyOf:
+          - resourceRef: user:default/guest  # Específico para tu guest
+          - isEntityPublic: true

@@ -1,5 +1,5 @@
 # Stage 1 - Create yarn install skeleton layer 
-FROM node:20-bullseye-slim as builder
+FROM node:22-bookworm-slim as builder
 # Instalar dependencias del sistema
 RUN apt-get update && apt-get install -y \
     python3 \
@@ -42,7 +42,7 @@ RUN yarn build:backend
 
 
 # Production stage
-FROM node:20-bullseye-slim
+FROM node:22-bookworm-slim
 
 RUN apt-get update && apt-get install -y \
     curl \
@@ -74,5 +74,7 @@ RUN echo "=== RUNTIME FILES ===" && \
 ENTRYPOINT ["dumb-init", "--"]
 CMD ["sh", "-c", "yarn workspace backend start   2>/dev/null"]
  
+#CMD ["sh", "-c", "node packages/backend/dist/index.js --config app-config.yaml & yarn workspace @backstage/app-default start"]
+#CMD ["sh", "-c", "if yarn workspace backend start 2>/dev/null; then exit 0; elif yarn dev 2>/dev/null; then exit 0; elif node packages/backend/dist/index.js 2>/dev/null; then exit 0; else echo 'No suitable start command found' && yarn --help; fi"]
 #CMD ["sh", "-c", "node packages/backend/dist/index.js --config app-config.yaml & yarn workspace @backstage/app-default start"]
 #CMD ["sh", "-c", "if yarn workspace backend start 2>/dev/null; then exit 0; elif yarn dev 2>/dev/null; then exit 0; elif node packages/backend/dist/index.js 2>/dev/null; then exit 0; else echo 'No suitable start command found' && yarn --help; fi"]

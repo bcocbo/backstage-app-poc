@@ -11,7 +11,7 @@ microservice:
 {% if values.isPrebuiltImage %}
   image: "${{ values.image }}:${{ values.imageTag }}"
 {% else %}
-  image: "226633502530.dkr.ecr.us-east-1.amazonaws.com/${{ values.name }}:latest"
+  image: "<AWS_ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/${{ values.name }}:latest"
 {% endif %}
   port: {% if values.isPrebuiltImage %}80{% else %}8000{% endif %}
   replicas: ${{ values.replicas }}

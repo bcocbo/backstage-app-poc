@@ -1,272 +1,244 @@
-# Backstage GitOps Platform
+# Backstage + ArgoCD + GitOps Platform
 
-Enterprise-grade GitOps platform built on Backstage with ArgoCD integration for automated Kubernetes deployments.
+Plataforma de despliegue automatizado que integra Backstage, ArgoCD y GitOps para crear y desplegar aplicaciones en Kubernetes de forma automática.
 
-## 🚀 Quick Start
+## 🚀 Características
+
+- **Portal de Desarrollador (Backstage)**: Interfaz web para crear aplicaciones
+- **Templates de Software**: Plantillas para Python y Node.js
+- **CI/CD Automatizado**: GitHub Actions integrado
+- **GitOps**: Despliegues automáticos con ArgoCD
+- **Helm Chart Transversal**: Templates estandarizados de Kubernetes
+
+## 📋 Requisitos Previos
+
+- Node.js 18+ y Yarn
+- PostgreSQL 12+
+- Cuenta de GitHub con token de acceso
+- Cluster de Kubernetes con ArgoCD instalado
+- AWS Account (para ECR)
+
+## 🔧 Instalación Local
+
+### 1. Clonar el Repositorio
 
 ```bash
-# Install dependencies
+git clone https://github.com/bcocbo/backstage-app-poc.git
+cd backstage-app-poc
+```
+
+### 2. Instalar Dependencias
+
+```bash
 yarn install
-
-# Start Backstage with environment variables
-./start-with-env.sh
-
-# OR start normally
-yarn start
 ```
 
-Open http://localhost:3000
-
-**⚠️ Si tienes problemas iniciando**: Ver [COMO_INICIAR.md](COMO_INICIAR.md)
-
-## 📚 Documentation
-
-### 🌟 Portal de Documentación
-- **[📄 Portal Visual de Documentación](docs/index.html)** - Acceso visual a toda la documentación
-- **[📋 Documentación Completa (HTML)](docs/documentacion-completa.html)** - Todo en una sola página con Markdown y diagramas renderizados
-
-Para regenerar la documentación HTML:
-```bash
-python3 generate-docs.py
-```
-
-### Quick Access
-- **[Quick Reference Card](QUICK_REFERENCE.md)** - Common commands and tasks ⚡
-
-### For Developers
-- **[Developer Quick Start](DEVELOPER_QUICK_START.md)** - Create and deploy your first application
-- **[Testing Guide](TEST_TEMPLATE.md)** - How to test the template
-
-### For Platform Team
-- **[Implementation Summary](IMPLEMENTATION_SUMMARY.md)** - Architecture and design decisions
-- **[GitOps Setup](GITOPS_SETUP.md)** - Configure GitOps repositories
-- **[ArgoCD Setup](ARGOCD_SETUP.md)** - Configure ArgoCD integration
-- **[GitHub Token Setup](SOLUCION_TOKEN.md)** - Troubleshoot GitHub authentication
-- **[🔐 Configurar Secrets de GitHub](CONFIGURAR_SECRETS_GITHUB.md)** - Configurar AWS y GitHub secrets para CI/CD
-
-### Advanced Guides
-- **[🔌 Agregar Plugin a Backstage](GUIA_AGREGAR_PLUGIN.md)** - Guía completa para agregar plugins
-- **[📝 Crear Scaffolder Template](GUIA_CREAR_SCAFFOLDER.md)** - Guía paso a paso para crear templates
-
-### Technical Documentation
-- **[Requirements](.kiro/specs/backstage-argocd-gitops-flow/requirements.md)** - Detailed requirements
-- **[Design](.kiro/specs/backstage-argocd-gitops-flow/design.md)** - System design
-- **[Tasks](.kiro/specs/backstage-argocd-gitops-flow/tasks.md)** - Implementation tasks
-
-## 🏗️ Architecture
-
-```
-Backstage → GitHub (App Repos) → CI/CD → ECR → GitOps Repo → ArgoCD → Kubernetes
-```
-
-### Key Components
-
-1. **Backstage**: Developer portal and software catalog
-2. **Software Templates**: Automated project scaffolding
-3. **GitOps Repository**: Centralized configuration management
-4. **Helm Chart**: Transversal chart for all applications
-5. **ArgoCD**: Continuous deployment to Kubernetes
-6. **CI/CD**: Automated build and deployment pipeline
-
-## ✨ Features
-
-- ✅ **Two Application Types**:
-  - Custom applications with full CI/CD (Node.js, Python, Java, Go, .NET)
-  - Prebuilt images (nginx, redis, etc.)
-- ✅ **Multi-Environment**: dev, staging, production
-- ✅ **GitOps Workflow**: Pull request-based deployments
-- ✅ **ArgoCD Integration**: Real-time deployment status in Backstage
-- ✅ **Automated CI/CD**: Build, test, and deploy on every commit
-- ✅ **Security**: OIDC authentication, non-root containers, security contexts
-- ✅ **Scalability**: Supports 100+ applications
-
-## 🎯 Creating Your First Application
-
-1. Click **Create** in Backstage
-2. Select **ArgoCD - Aplicación Hola Mundo**
-3. Fill in the form (name, environment, type)
-4. Click **Create**
-5. Approve the GitOps PR
-6. Watch ArgoCD deploy automatically!
-
-See [Developer Quick Start](DEVELOPER_QUICK_START.md) for detailed instructions.
-
-## 🔧 Configuration
-
-### Required Environment Variables
+### 3. Configurar PostgreSQL
 
 ```bash
-# PostgreSQL
-POSTGRES_HOST=localhost
-POSTGRES_PORT=5432
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=postgres
+# Crear base de datos
+createdb backstage
 
-# GitHub
-GITHUB_TOKEN=your-github-token
-
-# ArgoCD
-ARGOCD_URL=https://argocd.example.com
-ARGOCD_AUTH_TOKEN=your-argocd-token
-```
-
-See `.env.example` for all available options.
-
-### GitHub Token
-
-The GitHub token needs write access to create repositories. See [SOLUCION_TOKEN.md](SOLUCION_TOKEN.md) for setup instructions.
-
-### ArgoCD Integration
-
-Configure ArgoCD credentials to see deployment status in Backstage. See [ARGOCD_SETUP.md](ARGOCD_SETUP.md) for detailed setup.
-
-## 📦 Repositories
-
-### Application Repositories
-- Created automatically by Backstage template
-- Contains application code and Dockerfile
-- Includes CI/CD workflow
-- Example: `https://github.com/bcocbo/my-app`
-
-### GitOps Repository
-- **URL**: `https://github.com/bcocbo/gitops-apps`
-- Centralized configuration for all applications
-- Environment-specific values
-- ArgoCD application definitions
-
-### Helm Chart Repository
-- **URL**: `https://github.com/bcocbo/eks_baseline_chart_Helm`
-- Transversal Helm chart for all applications
-- Standardized Kubernetes resources
-- Security best practices built-in
-
-## 🔐 Security
-
-- ✅ Non-root containers
-- ✅ Security contexts configured
-- ✅ Resource limits enforced
-- ✅ OIDC for AWS authentication
-- ✅ Secrets management via Kubernetes
-- ✅ RBAC in ArgoCD
-- ✅ Pull request-based approvals
-
-## 🌍 Environments
-
-### Development
-- Auto-sync enabled
-- Fast iteration
-- No approval required
-
-### Staging
-- Auto-sync enabled
-- Pre-production testing
-- Approval recommended
-
-### Production
-- Auto-sync with sync window (2-6 AM)
-- Manual approval required
-- Prune and self-heal disabled
-
-## 🛠️ Helper Scripts
-
-```bash
-# Start Backstage with environment variables
-./start-with-env.sh
-
-# Restart Backstage (kills existing process)
-./restart-backstage.sh
-
-# Setup PostgreSQL
+# O usar el script incluido
 ./setup-postgres.sh
 ```
 
-## 📊 Monitoring
+### 4. Configurar Variables de Entorno
 
-### In Backstage
-- **Catalog**: View all applications
-- **Overview Tab**: ArgoCD sync status
-- **ArgoCD Tab**: Detailed deployment info
-- **Kubernetes Tab**: Pod status and logs
+Crear archivo `.env` en la raíz del proyecto:
 
-### In ArgoCD
-- Application health and sync status
-- Resource tree visualization
-- Deployment history
-- Sync operations
+```bash
+# Node.js Configuration
+NODE_OPTIONS=--no-node-snapshot
+
+# PostgreSQL Configuration
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+POSTGRES_USER=tu_usuario
+POSTGRES_PASSWORD=tu_password
+
+# GitHub Token
+GITHUB_TOKEN=tu_github_token
+
+# ArgoCD Configuration (opcional para plugin)
+ARGOCD_URL=https://argocd.tu-dominio.com
+ARGOCD_USERNAME=admin
+ARGOCD_PASSWORD=tu_password_argocd
+```
+
+### 5. Iniciar Backstage
+
+```bash
+yarn dev
+```
+
+Backstage estará disponible en: http://localhost:3000
+
+## 🐳 Despliegue en Kubernetes
+
+### Usando el Dockerfile incluido
+
+```bash
+# Build
+docker build -t backstage:latest .
+
+# Push a tu registry
+docker tag backstage:latest tu-registry/backstage:latest
+docker push tu-registry/backstage:latest
+```
+
+### Desplegar en EKS
+
+```bash
+# Port forward a Backstage
+kubectl port-forward svc/backstage 3000:3000 -n backstage
+
+# Port forward a ArgoCD (si es necesario)
+kubectl port-forward svc/argocd-server 8080:443 -n argocd
+```
+
+## 📝 Configuración de GitHub Secrets
+
+Para que el CI/CD funcione, configura estos secrets en tus repositorios:
+
+### En el repositorio de cada aplicación:
+
+- `AWS_ROLE_ARN`: ARN del rol de AWS para OIDC
+- `GITOPS_TOKEN`: Token de GitHub con permisos para el repo gitops-apps
+
+### Script de configuración:
+
+```bash
+./setup-github-secrets.sh
+```
+
+## 🎯 Uso
+
+### Crear una Nueva Aplicación
+
+1. Accede a Backstage: http://localhost:3000
+2. Ve a "Create" en el menú lateral
+3. Selecciona "ArgoCD - Aplicación Hola Mundo"
+4. Completa el formulario:
+   - Nombre de la aplicación
+   - Entorno (dev/staging/prod)
+   - Tipo (Python custom o imagen preconstruida)
+5. Haz clic en "Create"
+
+### Flujo Automático
+
+1. **Backstage** crea el repositorio en GitHub
+2. **GitHub Actions** construye la imagen Docker
+3. **ECR** almacena la imagen
+4. **GitOps** actualiza la configuración (PR automático)
+5. **ArgoCD** despliega automáticamente en Kubernetes
+
+## 📁 Estructura del Proyecto
+
+```
+backstage-app-poc/
+├── app-config.yaml              # Configuración principal de Backstage
+├── app-config.production.yaml   # Configuración para producción
+├── package.json                 # Dependencies
+├── .env                         # Variables de entorno (crear)
+├── examples/
+│   └── argocd-template/         # Template de ArgoCD
+│       ├── template.yaml        # Definición del template
+│       ├── content/             # Archivos base
+│       │   ├── Dockerfile
+│       │   ├── catalog-info.yaml
+│       │   └── .github/workflows/ci.yaml
+│       ├── content-python/      # Archivos Python
+│       └── gitops-values/       # Configuración GitOps
+├── packages/
+│   ├── app/                     # Frontend de Backstage
+│   └── backend/                 # Backend de Backstage
+└── charts/
+    └── eks_baseline_chart-Helm-1/  # Helm chart transversal
+```
+
+## 🔐 Seguridad
+
+- **No incluir tokens** en el código
+- Usar **variables de entorno** para credenciales
+- Configurar **GitHub Secrets** para CI/CD
+- Usar **OIDC** para autenticación con AWS (sin credenciales estáticas)
+
+## 🛠️ Configuración de ArgoCD
+
+### Crear Proyectos en ArgoCD
+
+```bash
+# Proyecto dev
+kubectl apply -f - <<EOF
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: dev
+  namespace: argocd
+spec:
+  destinations:
+  - namespace: dev
+    server: https://kubernetes.default.svc
+  sourceRepos:
+  - '*'
+EOF
+```
+
+### Configurar App of Apps (opcional)
+
+Ver documentación en: `CONFIGURAR_ARGOCD_APP_OF_APPS.md`
+
+## 📚 Documentación Adicional
+
+- `RESUMEN_EJECUTIVO_GERENCIA.md` - Resumen para gerencia
+- `DEVELOPER_QUICK_START.md` - Guía rápida para desarrolladores
+- `CONFIGURACION_ARGOCD_PLUGIN.md` - Configuración del plugin de ArgoCD
+- `GUIA_CREAR_SCAFFOLDER.md` - Cómo crear templates personalizados
 
 ## 🐛 Troubleshooting
 
-### Backstage Won't Start
-```bash
-# Check PostgreSQL
-psql -h localhost -U postgres -d postgres
+### Error 401 Unauthorized
 
-# Check environment variables
-cat .env
+Verifica que el `GITHUB_TOKEN` en `.env` sea válido y tenga los permisos necesarios.
 
-# Check logs
-yarn start
-```
-
-### Template Creation Fails
-- Verify GitHub token has correct permissions
-- Check repository doesn't already exist
-- Review Backstage logs
-
-### ArgoCD Not Showing
-- Verify ArgoCD credentials in `.env`
-- Check annotations in `catalog-info.yaml`
-- Ensure ArgoCD application exists
-
-See individual documentation files for detailed troubleshooting.
-
-## 🧪 Testing
+### Backstage no inicia
 
 ```bash
-# Run all tests
-yarn test
+# Verificar PostgreSQL
+psql -U tu_usuario -d backstage -c "SELECT 1"
 
-# Run specific test
-yarn test <test-name>
-
-# E2E tests
-yarn test:e2e
+# Limpiar y reinstalar
+rm -rf node_modules
+yarn install
 ```
 
-See [TEST_TEMPLATE.md](TEST_TEMPLATE.md) for testing guide.
+### ArgoCD no sincroniza
 
-## 📈 Roadmap
+Verifica que:
+- El repositorio gitops-apps exista
+- ArgoCD tenga acceso al repositorio
+- Los proyectos de ArgoCD estén configurados correctamente
 
-- [x] Basic Backstage setup
-- [x] Software template
-- [x] GitOps repository structure
-- [x] Helm chart
-- [x] CI/CD pipeline
-- [x] ArgoCD integration
-- [ ] Property-based tests
-- [ ] Integration tests
-- [ ] Notifications
-- [ ] Metrics and dashboards
-- [ ] Progressive delivery (Canary, Blue/Green)
-- [ ] Multi-cluster support
+## 🤝 Contribuir
 
-## 🤝 Contributing
+1. Fork el proyecto
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
 
-1. Create a feature branch
-2. Make your changes
-3. Test thoroughly
-4. Submit a pull request
+## 📄 Licencia
 
-## 📞 Support
+Este proyecto es de uso interno.
 
-- **Documentation**: See links above
-- **Issues**: Create a GitHub issue
-- **Platform Team**: Contact for assistance
+## 📞 Soporte
 
-## 📄 License
-
-This project is licensed under the Apache License 2.0.
+Para soporte o preguntas:
+- Documentación: Este repositorio
+- Issues: GitHub Issues
+- Equipo: DevOps Team
 
 ---
 
-Built with ❤️ using [Backstage](https://backstage.io)
+**Nota**: Este README asume que tienes acceso a los recursos necesarios (AWS, GitHub, Kubernetes). Ajusta las configuraciones según tu entorno.

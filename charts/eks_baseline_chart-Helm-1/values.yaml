@@ -1,0 +1,77 @@
+# =============================================================================
+# MICROSERVICE CONFIGURATION
+# =============================================================================
+microservice:
+  # REQUIRED: Configuración básica del microservicio
+  name: ""                    # Nombre del microservicio
+  namespace: ""               # Namespace de Kubernetes
+  image: ""                   # Imagen del contenedor (registry/repo:tag)
+  port: 8080                  # Puerto del contenedor
+  replicas: 1                 # Número de réplicas
+  
+  # Flags de características
+  flags:
+    openTelemetry: false      # Habilitar OpenTelemetry
+  
+  # Seguridad básica (valores seguros por defecto)
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    capabilities:
+      drop:
+        - ALL
+  
+  # REQUIRED: Etiquetas estándar (completar con valores de tu proyecto)
+  labels:
+    app: ""                   # Nombre de la aplicación
+    environment: ""           # development, staging, production
+    team: ""                  # Equipo responsable
+    costCenter: ""            # Centro de costos
+    applicationCode: ""       # Código de aplicación
+    projectName: ""           # Nombre del proyecto
+    pmo: ""                   # PMO responsable
+    responsible: ""           # Persona responsable
+
+# =============================================================================
+# SERVICE CONFIGURATION
+# =============================================================================
+service:
+  type: ClusterIP
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+      portName: http
+
+# =============================================================================
+# CONFIGMAP CONFIGURATION
+# =============================================================================
+configmap:
+  enabled: false              # Cambiar a true si necesitas variables de entorno
+  data: {}                    # Agregar tus variables aquí
+
+# =============================================================================
+# HPA CONFIGURATION
+# =============================================================================
+hpa:
+  enabled: false              # Cambiar a true para habilitar autoescalado
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+
+# =============================================================================
+# ISTIO GATEWAY CONFIGURATION
+# =============================================================================
+gateway:
+  enabled: false              # Cambiar a true si usas Istio
+  selector:
+    istio: ingressgateway
+  servers: []                 # Configurar según tus necesidades
+
+# =============================================================================
+# ISTIO VIRTUAL SERVICE CONFIGURATION
+# =============================================================================
+virtualService:
+  enabled: false              # Cambiar a true si usas Istio
+  hosts: []
+  gateways: []

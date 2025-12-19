@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.microservice.name}}-service
+  namespace: {{ .Values.microservice.namespace }}
+  labels:
+    {{- include "eks-baseline.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  selector:
+    pod: {{ .Values.microservice.name  }}-pod
+    app: {{ .Values.microservice.labels.projectName }}
+  ports:
+  {{- range .Values.service.ports }}
+    - protocol: {{ .protocol }}
+      port: {{ .port }}
+      targetPort: {{ .targetPort }}
+      name: {{ .portName }}
+  {{- end }}
+
+ 

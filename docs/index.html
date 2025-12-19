@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backstage GitOps Platform - Portal de Documentación</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 3rem;
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.3rem;
+            opacity: 0.95;
+        }
+        
+        .status {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            color: white;
+        }
+        
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .status-item {
+            background: rgba(255,255,255,0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .status-item .icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+        
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .card h3 {
+            color: #667eea;
+            margin-bottom: 0.5rem;
+            font-size: 1.5rem;
+        }
+        
+        .card p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+        
+        .card-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .card-links a {
+            color: #667eea;
+            text-decoration: none;
+            padding: 0.5rem;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        
+        .card-links a:hover {
+            background: #f0f0f0;
+        }
+        
+        .quick-access {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .quick-access h2 {
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+        
+        .quick-links {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .quick-link {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.3s;
+        }
+        
+        .quick-link:hover {
+            transform: scale(1.05);
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 { font-size: 2rem; }
+            .grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Backstage GitOps Platform</h1>
+            <p>Portal de Documentación Completa</p>
+        </div>
+
+        <div class="status">
+            <h2 style="margin-bottom: 1rem;">📊 Estado del Sistema</h2>
+            <div class="status-grid">
+                <div class="status-item">
+                    <div class="icon">✅</div>
+                    <div><strong>Backstage</strong></div>
+                    <div>Funcionando</div>
+                </div>
+                <div class="status-item">
+                    <div class="icon">✅</div>
+                    <div><strong>Backend</strong></div>
+                    <div>Puerto 7007</div>
+                </div>
+                <div class="status-item">
+                    <div class="icon">✅</div>
+                    <div><strong>PostgreSQL</strong></div>
+                    <div>Conectado</div>
+                </div>
+                <div class="status-item">
+                    <div class="icon">✅</div>
+                    <div><strong>Templates</strong></div>
+                    <div>2 tipos, 5 lenguajes</div>
+                </div>
+                <div class="status-item">
+                    <div class="icon">✅</div>
+                    <div><strong>CI/CD</strong></div>
+                    <div>GitHub Actions</div>
+                </div>
+                <div class="status-item">
+                    <div class="icon">✅</div>
+                    <div><strong>Documentación</strong></div>
+                    <div>15+ archivos</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="quick-access">
+            <h2>⚡ Acceso Rápido</h2>
+            <div class="quick-links">
+                <a href="documentacion-completa.html" class="quick-link">📄 Documentación Completa (HTML)</a>
+                <a href="http://localhost:3000" class="quick-link" target="_blank">🌐 Abrir Backstage</a>
+                <a href="../README.md" class="quick-link">📖 README Principal</a>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="card" onclick="window.location.href='../README.md'">
+                <div class="card-icon">🏠</div>
+                <h3>Inicio</h3>
+                <p>Información general del proyecto, características y quick start</p>
+                <div class="card-links">
+                    <a href="../README.md">→ README Principal</a>
+                    <a href="../RESUMEN_FINAL.md">→ Resumen Final</a>
+                    <a href="../SESSION_SUMMARY.md">→ Resumen de Sesión</a>
+                </div>
+            </div>
+
+            <div class="card" onclick="window.location.href='../ARQUITECTURA_DIAGRAMA.md'">
+                <div class="card-icon">🏗️</div>
+                <h3>Arquitectura</h3>
+                <p>Diagramas completos del sistema, flujos y componentes</p>
+                <div class="card-links">
+                    <a href="../ARQUITECTURA_DIAGRAMA.md">→ Diagramas de Arquitectura</a>
+                    <a href="../IMPLEMENTATION_SUMMARY.md">→ Resumen de Implementación</a>
+                    <a href="../.kiro/specs/backstage-argocd-gitops-flow/design.md">→ Diseño del Sistema</a>
+                </div>
+            </div>
+
+            <div class="card" onclick="window.location.href='../ARGOCD_SETUP.md'">
+                <div class="card-icon">⚙️</div>
+                <h3>Setup y Configuración</h3>
+                <p>Guías paso a paso para configurar todos los componentes</p>
+                <div class="card-links">
+                    <a href="../ARGOCD_SETUP.md">→ Setup de ArgoCD</a>
+                    <a href="../GITOPS_SETUP.md">→ Setup de GitOps</a>
+                    <a href="../COMO_INICIAR.md">→ Cómo Iniciar Backstage</a>
+                </div>
+            </div>
+
+            <div class="card" onclick="window.location.href='../DEVELOPER_QUICK_START.md'">
+                <div class="card-icon">👨‍💻</div>
+                <h3>Desarrollo</h3>
+                <p>Guías para desarrolladores, quick start y referencias</p>
+                <div class="card-links">
+                    <a href="../DEVELOPER_QUICK_START.md">→ Quick Start Desarrolladores</a>
+                    <a href="../QUICK_REFERENCE.md">→ Referencia Rápida</a>
+                    <a href="../TEST_TEMPLATE.md">→ Guía de Testing</a>
+                </div>
+            </div>
+
+            <div class="card" onclick="window.location.href='../GUIA_AGREGAR_PLUGIN.md'">
+                <div class="card-icon">🔌</div>
+                <h3>Guías Avanzadas</h3>
+                <p>Guías paso a paso para extender Backstage</p>
+                <div class="card-links">
+                    <a href="../GUIA_AGREGAR_PLUGIN.md">→ Agregar Plugin a Backstage</a>
+                    <a href="../GUIA_CREAR_SCAFFOLDER.md">→ Crear Scaffolder Template</a>
+                </div>
+            </div>
+
+            <div class="card" onclick="window.location.href='../ACTUALIZACION_CHART_TRANSVERSAL.md'">
+                <div class="card-icon">🔧</div>
+                <h3>Operaciones</h3>
+                <p>Gestión de operaciones, actualizaciones y mantenimiento</p>
+                <div class="card-links">
+                    <a href="../ACTUALIZACION_CHART_TRANSVERSAL.md">→ Actualización del Chart</a>
+                    <a href="../.kiro/specs/backstage-argocd-gitops-flow/tasks.md">→ Tareas de Implementación</a>
+                </div>
+            </div>
+
+            <div class="card" onclick="window.location.href='../SECURITY_CRITICAL.md'">
+                <div class="card-icon">🔐</div>
+                <h3>Seguridad</h3>
+                <p>Gestión de tokens, credenciales y mejores prácticas</p>
+                <div class="card-links">
+                    <a href="../SECURITY_CRITICAL.md">→ Seguridad Crítica</a>
+                    <a href="../SOLUCION_TOKEN.md">→ Solución Tokens</a>
+                    <a href="../FIX_GITHUB_TOKEN.md">→ Fix GitHub Token</a>
+                </div>
+            </div>
+
+            <div class="card" onclick="window.location.href='../COMO_INICIAR.md'">
+                <div class="card-icon">🐛</div>
+                <h3>Troubleshooting</h3>
+                <p>Solución de problemas comunes y debugging</p>
+                <div class="card-links">
+                    <a href="../COMO_INICIAR.md">→ Cómo Iniciar</a>
+                    <a href="../ARGOCD_PLUGIN_NOTE.md">→ Nota Plugin ArgoCD</a>
+                    <a href="../SOLUCION_TOKEN.md">→ Problemas con Tokens</a>
+                </div>
+            </div>
+
+            <div class="card" onclick="window.location.href='../PRODUCTION_CHECKLIST.md'">
+                <div class="card-icon">✅</div>
+                <h3>Producción</h3>
+                <p>Checklist completo para deployment en producción</p>
+                <div class="card-links">
+                    <a href="../PRODUCTION_CHECKLIST.md">→ Checklist de Producción</a>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; color: white; margin-top: 3rem; opacity: 0.9;">
+            <p><strong>Backstage GitOps Platform v1.0.0</strong></p>
+            <p>Documentación generada - Diciembre 2025</p>
+            <p>Estado: ✅ Implementación Completa y Funcional</p>
+        </div>
+    </div>
+</body>
+</html>

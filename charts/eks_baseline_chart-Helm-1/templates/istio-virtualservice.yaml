@@ -1,0 +1,72 @@
+{{- if .Values.virtualService.enabled }}
+{{- $vs := .Values.virtualService }}
+{{- $simple := $vs.simpleRouting }}
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: {{ $vs.name | default (printf "%s-vs" .Values.microservice.name) }}
+  namespace: {{ .Values.microservice.namespace }}
+  labels:
+    {{- include "eks-baseline.labels" . | nindent 4 }}
+  {{- with $vs.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with $vs.hosts }}
+  hosts:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with $vs.gateways }}
+  gateways:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- if $vs.http }}
+  http:
+    {{- toYaml $vs.http | nindent 4 }}
+  {{- else if $simple }}
+  http:
+    - match:
+        - uri:
+            prefix: {{ $simple.prefix | default ($simple.path | default "/") }}
+      {{- with $simple.rewrite }}
+      rewrite:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      route:
+        - destination:
+            host: {{ $simple.host | default (printf "%s-service" .Values.microservice.name) }}
+            port:
+              number: {{ $simple.port | default 80 }}
+      {{- with $simple.timeout }}
+      timeout: {{ . }}
+      {{- end }}
+      {{- with $simple.retries }}
+      retries:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if $simple.headers }}
+      headers:
+        {{- toYaml $simple.headers | nindent 8 }}
+      {{- else if $vs.securityHeaders }}
+      headers:
+        response:
+          add:
+            x-content-type-options: "nosniff"
+            x-frame-options: "DENY"
+            strict-transport-security: "max-age=31536000"
+            content-security-policy: "frame-ancestors 'self'; referrer-policy 'origin'; upgrade-insecure-requests; default-src 'self';"
+            {{- with $vs.customSecurityHeaders }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+      {{- end }}
+  {{- end }}
+  {{- with $vs.tcp }}
+  tcp:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with $vs.tls }}
+  tls:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}

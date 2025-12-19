@@ -1,0 +1,134 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ required "microservice.name is required" .Values.microservice.name }}-deployment
+  namespace: {{ required "microservice.namespace is required" .Values.microservice.namespace }}
+  labels:
+    {{- include "eks-baseline.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.microservice.replicas | default 1 }}
+  {{- if .Values.microservice.strategy }}
+  strategy:
+    {{- toYaml .Values.microservice.strategy | nindent 4 }}
+  {{- end }}
+  selector:
+    matchLabels:
+      pod: {{ .Values.microservice.name }}-pod
+  template:
+    metadata:
+      labels:
+        pod: {{ .Values.microservice.name }}-pod
+    {{- if or .Values.annotations .Values.microservice.flags.openTelemetry }}
+    annotations:
+      {{- range $key, $value := .Values.annotations }}
+      {{ $key }}: "{{ $value }}"
+      {{- end }}
+      {{- if .Values.microservice.flags.openTelemetry }}
+      sidecar.opentelemetry.io/inject: "true"
+      {{- end }}
+    {{- end }}
+    spec:
+      serviceAccountName: {{ .Values.microservice.serviceAccountName | default "default" }}
+      automountServiceAccountToken: {{ .Values.microservice.automountServiceAccountToken | default false }}
+      securityContext:
+        runAsNonRoot: {{ .Values.microservice.securityContext.runAsNonRoot | default true }}
+        runAsGroup: {{ .Values.microservice.securityContext.runAsGroup }}
+        fsGroup: {{ .Values.microservice.securityContext.fsGroup  }}
+        runAsUser: {{ .Values.microservice.securityContext.runAsUser }}
+        seccompProfile:
+          type: {{ .Values.microservice.securityContext.seccompProfile | default "RuntimeDefault" }}
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              pod: {{ .Values.microservice.name }}-pod
+      containers:
+        - name: {{ .Values.microservice.name }}-container
+          image: "{{ required "microservice.image is required" .Values.microservice.image }}"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: {{ required "microservice.port is required" .Values.microservice.port }}
+          resources:
+            {{- toYaml .Values.microservice.resources | nindent 12 }}
+          {{- if and .Values.microservice.probes .Values.microservice.probes.liveness .Values.microservice.probes.liveness.enabled }}
+          livenessProbe:
+            {{- if .Values.microservice.probes.liveness.httpGet }}
+            httpGet:
+              path: {{ .Values.microservice.probes.liveness.httpGet.path | default "/health/liveness" }}
+              port: {{ .Values.microservice.probes.liveness.httpGet.port | default "http" }}
+              scheme: {{ .Values.microservice.probes.liveness.httpGet.scheme | default "HTTP" }}
+            {{- end }}
+            initialDelaySeconds: {{ .Values.microservice.probes.liveness.initialDelaySeconds | default 30 }}
+            periodSeconds: {{ .Values.microservice.probes.liveness.periodSeconds | default 10 }}
+            timeoutSeconds: {{ .Values.microservice.probes.liveness.timeoutSeconds | default 5 }}
+            successThreshold: {{ .Values.microservice.probes.liveness.successThreshold | default 1 }}
+            failureThreshold: {{ .Values.microservice.probes.liveness.failureThreshold | default 3 }}
+          {{- end }}
+          {{- if and .Values.microservice.probes .Values.microservice.probes.readiness .Values.microservice.probes.readiness.enabled }}
+          readinessProbe:
+            {{- if .Values.microservice.probes.readiness.httpGet }}
+            httpGet:
+              path: {{ .Values.microservice.probes.readiness.httpGet.path | default "/health/readiness" }}
+              port: {{ .Values.microservice.probes.readiness.httpGet.port | default "http" }}
+              scheme: {{ .Values.microservice.probes.readiness.httpGet.scheme | default "HTTP" }}
+            {{- end }}
+            initialDelaySeconds: {{ .Values.microservice.probes.readiness.initialDelaySeconds | default 5 }}
+            periodSeconds: {{ .Values.microservice.probes.readiness.periodSeconds | default 10 }}
+            timeoutSeconds: {{ .Values.microservice.probes.readiness.timeoutSeconds | default 5 }}
+            successThreshold: {{ .Values.microservice.probes.readiness.successThreshold | default 1 }}
+            failureThreshold: {{ .Values.microservice.probes.readiness.failureThreshold | default 3 }}
+          {{- end }}
+          {{- if and .Values.microservice.probes .Values.microservice.probes.startup .Values.microservice.probes.startup.enabled }}
+          startupProbe:
+            {{- if .Values.microservice.probes.startup.httpGet }}
+            httpGet:
+              path: {{ .Values.microservice.probes.startup.httpGet.path | default "/health/readiness" }}
+              port: {{ .Values.microservice.probes.startup.httpGet.port | default "http" }}
+              scheme: {{ .Values.microservice.probes.startup.httpGet.scheme | default "HTTP" }}
+            {{- end }}
+            initialDelaySeconds: {{ .Values.microservice.probes.startup.initialDelaySeconds | default 10 }}
+            periodSeconds: {{ .Values.microservice.probes.startup.periodSeconds | default 10 }}
+            timeoutSeconds: {{ .Values.microservice.probes.startup.timeoutSeconds | default 5 }}
+            successThreshold: {{ .Values.microservice.probes.startup.successThreshold | default 1 }}
+            failureThreshold: {{ .Values.microservice.probes.startup.failureThreshold | default 30 }}
+          {{- end }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.microservice.name }}-configmap
+          securityContext:
+            capabilities:
+              {{- toYaml .Values.microservice.securityContext.capabilities | nindent 13 }}
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          # Seccion general para definicion de puntos de montaje por el usuario
+          {{- if .Values.microservice.volumeMounts }}
+          volumeMounts:
+            {{- toYaml .Values.microservice.volumeMounts | nindent 12 }}
+          {{- end }}
+        {{- with .Values.microservice.sidecars }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.microservice.initContainers }}
+      initContainers:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

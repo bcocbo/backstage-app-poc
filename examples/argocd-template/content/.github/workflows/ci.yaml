@@ -85,11 +85,8 @@ jobs:
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
           
-          # Configurar autenticación con token
-          git config --global url."https://oauth2:{% raw %}${{ secrets.GITOPS_TOKEN }}{% endraw %}@github.com/".insteadOf "https://github.com/"
-          
           # Clonar repositorio GitOps
-          git clone https://github.com/{% raw %}${{ env.GITOPS_REPO }}{% endraw %}.git gitops-temp
+          git clone https://{% raw %}${{ secrets.GITOPS_TOKEN }}{% endraw %}@github.com/{% raw %}${{ env.GITOPS_REPO }}{% endraw %}.git gitops-temp
           cd gitops-temp
           
           # Crear branch para el cambio

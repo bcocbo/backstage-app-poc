@@ -1,0 +1,37 @@
+{{- if .Values.gateway.enabled }}
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: {{ .Values.gateway.name | default (printf "%s-gateway" .Values.microservice.name) }}
+  namespace: {{ .Values.microservice.namespace }}
+  labels:
+    {{- include "eks-baseline.labels" . | nindent 4 }}
+  {{- with .Values.gateway.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.gateway.selector }}
+  selector:
+    {{- toYaml .Values.gateway.selector | nindent 4 }}
+  {{- else }}
+  selector:
+    istio: ingressgateway
+  {{- end }}
+  servers:
+    {{- range .Values.gateway.servers }}
+    - port:
+        number: {{ .port.number | default 80 }}
+        name: {{ .port.name | default "http" }}
+        protocol: {{ .port.protocol | default "HTTP" }}
+      hosts:
+        {{- toYaml .hosts | nindent 8 }}
+      {{- if .tls }}
+      tls:
+        {{- toYaml .tls | nindent 8 }}
+      {{- end }}
+      {{- if .bind }}
+      bind: {{ .bind }}
+      {{- end }}
+    {{- end }}
+{{- end }}

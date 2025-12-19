@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.microservice.name }}-configmap
+  namespace: {{ .Values.microservice.namespace }}
+  labels:
+    {{- include "eks-baseline.labels" . | nindent 4 }}
+data:
+  {{- if .Values.configmap.data }}
+{{ .Values.configmap.data | toYaml | indent 2 }}
+  {{- end }}
